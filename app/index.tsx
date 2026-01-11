@@ -1,13 +1,59 @@
 import { Video, ResizeMode } from 'expo-av';
-import { useState, useRef } from 'react';
-import { StyleSheet, View, Text, Platform, ActivityIndicator } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
+import { StyleSheet, View, Text, Platform, ActivityIndicator, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const VIDEO_URL = 'https://lajiegouajqvecmilwyj.supabase.co/storage/v1/object/public/Welcome%20Video/download.mp4';
+const VIDEO_URL = 'https://github.com/reclaimhb-hash/rork-video-welcome-page/releases/download/assets-v1/download.mp4';
+const HAS_SEEN_WELCOME_KEY = 'has_seen_welcome_video';
 
 export default function WelcomeScreen() {
   const videoRef = useRef<Video>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasSeenWelcome, setHasSeenWelcome] = useState<boolean | null>(null);
+  const [showWelcome, setShowWelcome] = useState(true);
+
+  useEffect(() => {
+    checkFirstLaunch();
+  }, []);
+
+  const checkFirstLaunch = async () => {
+    try {
+      const seen = await AsyncStorage.getItem(HAS_SEEN_WELCOME_KEY);
+      console.log('Has seen welcome:', seen);
+      setHasSeenWelcome(seen === 'true');
+    } catch (err) {
+      console.error('Error checking first launch:', err);
+      setHasSeenWelcome(false);
+    }
+  };
+
+  const handleContinue = async () => {
+    try {
+      await AsyncStorage.setItem(HAS_SEEN_WELCOME_KEY, 'true');
+      setShowWelcome(false);
+      setHasSeenWelcome(true);
+    } catch (err) {
+      console.error('Error saving welcome state:', err);
+    }
+  };
+
+  if (hasSeenWelcome === null) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
+
+  if (hasSeenWelcome && !showWelcome) {
+    return (
+      <View style={styles.mainApp}>
+        <Text style={styles.mainAppText}>Main App</Text>
+        <Text style={styles.mainAppSubtext}>Welcome video completed</Text>
+      </View>
+    );
+  }
 
   if (Platform.OS === 'web') {
     return (
@@ -46,6 +92,9 @@ export default function WelcomeScreen() {
         )}
         <View style={styles.overlay}>
           <Text style={styles.welcomeText}>Welcome</Text>
+          <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+            <Text style={styles.continueText}>Get Started</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -84,6 +133,9 @@ export default function WelcomeScreen() {
       )}
       <View style={styles.overlay}>
         <Text style={styles.welcomeText}>Welcome</Text>
+        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+          <Text style={styles.continueText}>Get Started</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -131,5 +183,36 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0,0,0,0.5)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
+  },
+  continueButton: {
+    marginTop: 40,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
+  },
+  continueText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600' as const,
+    letterSpacing: 1,
+  },
+  mainApp: {
+    flex: 1,
+    backgroundColor: '#1a1a2e',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mainAppText: {
+    color: '#fff',
+    fontSize: 28,
+    fontWeight: '700' as const,
+  },
+  mainAppSubtext: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 16,
+    marginTop: 8,
   },
 });
