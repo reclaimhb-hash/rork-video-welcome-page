@@ -1,7 +1,8 @@
 import { Video, ResizeMode } from 'expo-av';
 import { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, Platform, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Platform, ActivityIndicator, TouchableOpacity, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const VIDEO_URL = 'https://github.com/reclaimhb-hash/rork-video-welcome-page/releases/download/assets-v1/Untitled.design.5.mp4';
 const HAS_SEEN_WELCOME_KEY = 'has_seen_welcome_video';
@@ -58,51 +59,20 @@ export default function WelcomeScreen() {
   if (Platform.OS === 'web') {
     return (
       <View style={styles.container}>
-        <video
-          src={VIDEO_URL}
-          autoPlay
-          loop
-          muted
-          playsInline
-          crossOrigin="anonymous"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
-          onLoadedData={() => {
-            console.log('Web video loaded successfully');
-            setIsLoading(false);
-          }}
-          onCanPlay={() => {
-            console.log('Web video can play');
-            setIsLoading(false);
-          }}
-          onError={(e) => {
-            const target = e.target as HTMLVideoElement;
-            const errorCode = target?.error?.code;
-            const errorMessage = target?.error?.message || 'Unknown error';
-            console.error('Web video error:', errorCode, errorMessage);
-            setError(`Video error: ${errorMessage}`);
-            setIsLoading(false);
-          }}
+        <LinearGradient
+          colors={['#1a1a2e', '#16213e', '#0f3460', '#533483']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
         />
-        {isLoading && (
-          <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#fff" />
-            <Text style={styles.loadingText}>Loading video...</Text>
-          </View>
-        )}
-        {error && (
-          <View style={styles.errorOverlay}>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        )}
+        <View style={styles.animatedBg}>
+          <View style={[styles.circle, styles.circle1]} />
+          <View style={[styles.circle, styles.circle2]} />
+          <View style={[styles.circle, styles.circle3]} />
+        </View>
         <View style={styles.overlay}>
           <Text style={styles.welcomeText}>Welcome</Text>
+          <Text style={styles.subtitleText}>Your journey begins here</Text>
           <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
             <Text style={styles.continueText}>Get Started</Text>
           </TouchableOpacity>
@@ -152,10 +122,48 @@ export default function WelcomeScreen() {
   );
 }
 
+const { width, height } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  animatedBg: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+  },
+  circle: {
+    position: 'absolute',
+    borderRadius: 999,
+    opacity: 0.3,
+  },
+  circle1: {
+    width: width * 0.8,
+    height: width * 0.8,
+    backgroundColor: '#e94560',
+    top: -width * 0.2,
+    left: -width * 0.2,
+  },
+  circle2: {
+    width: width * 0.6,
+    height: width * 0.6,
+    backgroundColor: '#533483',
+    bottom: height * 0.1,
+    right: -width * 0.1,
+  },
+  circle3: {
+    width: width * 0.5,
+    height: width * 0.5,
+    backgroundColor: '#0f3460',
+    bottom: -width * 0.1,
+    left: width * 0.2,
+  },
+  subtitleText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 18,
+    marginTop: 12,
+    letterSpacing: 1,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
