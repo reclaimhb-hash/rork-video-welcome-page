@@ -3,8 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text, Platform, ActivityIndicator, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const VIDEO_URL_NATIVE = 'https://github.com/reclaimhb-hash/rork-video-welcome-page/releases/download/assets-v1/Untitled.design.5.mp4';
-const VIDEO_URL_WEB = 'https://lajiegouajqvecmilwyj.supabase.co/storage/v1/object/public/Welcome%20Video/download.mp4';
+const VIDEO_URL = 'https://github.com/reclaimhb-hash/rork-video-welcome-page/releases/download/assets-v1/Untitled.design.5.mp4';
 const HAS_SEEN_WELCOME_KEY = 'has_seen_welcome_video';
 
 export default function WelcomeScreen() {
@@ -60,7 +59,7 @@ export default function WelcomeScreen() {
     return (
       <View style={styles.container}>
         <video
-          src={VIDEO_URL_WEB}
+          src={VIDEO_URL}
           autoPlay
           loop
           muted
@@ -116,7 +115,7 @@ export default function WelcomeScreen() {
     <View style={styles.container}>
       <Video
         ref={videoRef}
-        source={{ uri: VIDEO_URL_NATIVE }}
+        source={{ uri: VIDEO_URL }}
         style={StyleSheet.absoluteFill}
         resizeMode={ResizeMode.COVER}
         shouldPlay
