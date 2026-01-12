@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const VIDEO_URL = 'https://github.com/reclaimhb-hash/rork-video-welcome-page/releases/download/assets-v1/Untitled.design.5.mp4';
+const VIDEO_URL = 'https://github.com/reclaimhb-hash/rork-video-welcome-page/releases/download/assets-v1/Welcome.Video.mp4';
 
 console.log('Video URL:', VIDEO_URL);
 const HAS_SEEN_WELCOME_KEY = 'has_seen_welcome_video';
@@ -64,7 +64,7 @@ export default function WelcomeScreen() {
         style={StyleSheet.absoluteFill}
         resizeMode={ResizeMode.COVER}
         shouldPlay
-        isMuted={false}
+        isMuted={true}
         onLoad={() => {
           console.log('Video loaded');
           setIsLoading(false);
