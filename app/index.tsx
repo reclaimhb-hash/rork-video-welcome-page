@@ -5,6 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const VIDEO_URL = 'https://github.com/reclaimhb-hash/rork-video-welcome-page/releases/download/assets-v1/Untitled.design.5.mp4';
+
+console.log('Video URL:', VIDEO_URL);
 const HAS_SEEN_WELCOME_KEY = 'has_seen_welcome_video';
 
 export default function WelcomeScreen() {
@@ -13,6 +15,7 @@ export default function WelcomeScreen() {
   const [error, setError] = useState<string | null>(null);
   const [hasSeenWelcome, setHasSeenWelcome] = useState<boolean | null>(null);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     checkFirstLaunch();
@@ -79,14 +82,45 @@ export default function WelcomeScreen() {
     </View>
   );
 
-  if (Platform.OS === 'web' || error) {
+  const handleRetry = () => {
+    console.log('Retrying video load, attempt:', retryCount + 1);
+    setError(null);
+    setIsLoading(true);
+    setRetryCount(prev => prev + 1);
+  };
+
+  if (Platform.OS === 'web') {
     return renderFallbackWelcome();
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <LinearGradient
+          colors={['#1a1a2e', '#16213e', '#0f3460', '#533483']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
+        <View style={styles.overlay}>
+          <Text style={styles.welcomeText}>Welcome</Text>
+          <Text style={styles.errorInfoText}>Video failed to load</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+            <Text style={styles.continueText}>Retry Video</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+            <Text style={styles.continueText}>Skip & Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
       <Video
         ref={videoRef}
+        key={`video-${retryCount}`}
         source={{ uri: VIDEO_URL }}
         style={StyleSheet.absoluteFill}
         resizeMode={ResizeMode.COVER}
@@ -98,8 +132,9 @@ export default function WelcomeScreen() {
           setIsLoading(false);
         }}
         onError={(err) => {
-          console.error('Video error:', err);
-          setError('Failed to load video');
+          console.error('Video error details:', JSON.stringify(err, null, 2));
+          console.error('Video URL attempted:', VIDEO_URL);
+          setError(`Failed to load video: ${JSON.stringify(err)}`);
           setIsLoading(false);
         }}
       />
@@ -231,5 +266,20 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.6)',
     fontSize: 16,
     marginTop: 8,
+  },
+  errorInfoText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 14,
+    marginTop: 16,
+    textAlign: 'center' as const,
+  },
+  retryButton: {
+    marginTop: 24,
+    backgroundColor: 'rgba(233,69,96,0.6)',
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
   },
 });
