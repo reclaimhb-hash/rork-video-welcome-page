@@ -56,29 +56,31 @@ export default function WelcomeScreen() {
     );
   }
 
-  if (Platform.OS === 'web') {
-    return (
-      <View style={styles.container}>
-        <LinearGradient
-          colors={['#1a1a2e', '#16213e', '#0f3460', '#533483']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
-        <View style={styles.animatedBg}>
-          <View style={[styles.circle, styles.circle1]} />
-          <View style={[styles.circle, styles.circle2]} />
-          <View style={[styles.circle, styles.circle3]} />
-        </View>
-        <View style={styles.overlay}>
-          <Text style={styles.welcomeText}>Welcome</Text>
-          <Text style={styles.subtitleText}>Your journey begins here</Text>
-          <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-            <Text style={styles.continueText}>Get Started</Text>
-          </TouchableOpacity>
-        </View>
+  const renderFallbackWelcome = () => (
+    <View style={styles.container}>
+      <LinearGradient
+        colors={['#1a1a2e', '#16213e', '#0f3460', '#533483']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
+      <View style={styles.animatedBg}>
+        <View style={[styles.circle, styles.circle1]} />
+        <View style={[styles.circle, styles.circle2]} />
+        <View style={[styles.circle, styles.circle3]} />
       </View>
-    );
+      <View style={styles.overlay}>
+        <Text style={styles.welcomeText}>Welcome</Text>
+        <Text style={styles.subtitleText}>Your journey begins here</Text>
+        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+          <Text style={styles.continueText}>Get Started</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  if (Platform.OS === 'web' || error) {
+    return renderFallbackWelcome();
   }
 
   return (
@@ -107,11 +109,7 @@ export default function WelcomeScreen() {
           <Text style={styles.loadingText}>Loading video...</Text>
         </View>
       )}
-      {error && (
-        <View style={styles.errorOverlay}>
-          <Text style={styles.errorText}>{error}</Text>
-        </View>
-      )}
+
       <View style={styles.overlay}>
         <Text style={styles.welcomeText}>Welcome</Text>
         <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
